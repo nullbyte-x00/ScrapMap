@@ -90,6 +90,7 @@ def tel_corto(tel):
     return tel[2:] if tel and tel.startswith("57") and len(tel) == 12 else tel
 
 
+
 def fecha_corta(dt):
     try:
         return dt.astimezone().strftime("%d %b %H:%M")
