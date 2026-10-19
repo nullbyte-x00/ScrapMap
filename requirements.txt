@@ -1,0 +1,7 @@
+playwright
+groq
+httpx
+psycopg2-binary
+python-dotenv
+customtkinter
+tkintermapview
