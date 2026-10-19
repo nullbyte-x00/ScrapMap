@@ -1,9 +1,4 @@
-"""SCRAPMAP · Leads — scraper + CRM de prospectos en una sola app (CustomTkinter, modo oscuro).
 
-Uso:  python panel.py
-Requiere en la misma carpeta: scraping.py, db.py, auditoria.py, mapa.py y tu .env
-(el mapa usa:  pip install tkintermapview)
-"""
 import json
 import os
 import queue
