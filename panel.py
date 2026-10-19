@@ -1,4 +1,4 @@
-"""Webflux · Leads — scraper + CRM de prospectos en una sola app (CustomTkinter, modo oscuro).
+"""SCRAPMAP · Leads — scraper + CRM de prospectos en una sola app (CustomTkinter, modo oscuro).
 
 Uso:  python panel.py
 Requiere en la misma carpeta: scraping.py, db.py, auditoria.py, mapa.py y tu .env
@@ -112,7 +112,7 @@ class App(ctk.CTk):
     def __init__(self):
         super().__init__()
         ctk.set_appearance_mode("dark")
-        self.title("Webflux · Leads")
+        self.title("Scrap-map · Leads")
         sw, sh = self.winfo_screenwidth(), self.winfo_screenheight()
         w, h = min(1440, sw - 40), min(960, sh - 90)
         self.geometry(f"{w}x{h}+{max(0, (sw - w) // 2)}+{max(0, (sh - h) // 2 - 20)}")
@@ -120,7 +120,7 @@ class App(ctk.CTk):
         self.configure(fg_color=BG)
 
         self.fam = self._elegir_fuente()
-        self.conn = None
+        self.conn = Nonew
         self.filas = []          # todos los leads
         self.scrapes = []        # secciones con contadores
         self.sec = AUTO          # sección elegida: id, None (todas) o AUTO
@@ -258,7 +258,7 @@ class App(ctk.CTk):
         head = ctk.CTkFrame(self, fg_color="transparent")
         head.grid(row=0, column=0, sticky="ew", padx=18, pady=(14, 6))
         head.grid_columnconfigure(1, weight=1)
-        ctk.CTkLabel(head, text="WEBFLUX", font=self.F(17, True), text_color=BLANCO).grid(
+        ctk.CTkLabel(head, text="SCRAPMAP", font=self.F(17, True), text_color=BLANCO).grid(
             row=0, column=0, sticky="w")
         sub = ctk.CTkFrame(head, fg_color="transparent")
         sub.grid(row=0, column=1, sticky="w", padx=(8, 0))
@@ -1120,7 +1120,7 @@ class App(ctk.CTk):
         self._sp = sp
         centro = ctk.CTkFrame(sp, fg_color="transparent")
         centro.place(relx=0.5, rely=0.44, anchor="center")
-        ctk.CTkLabel(centro, text="WEBFLUX", font=self.F(32, True), text_color=BLANCO).pack()
+        ctk.CTkLabel(centro, text="SCRAPMAP", font=self.F(32, True), text_color=BLANCO).pack()
         ctk.CTkLabel(centro, text="Leads", font=self.F(13), text_color=GRIS).pack(pady=(0, 20))
         self._lbl_carga = ctk.CTkLabel(centro, text="Conectando con la base de datos…",
                                        font=self.F(11), text_color=GRIS)
