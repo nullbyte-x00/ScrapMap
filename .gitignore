@@ -1,0 +1,8 @@
+# Ignorar todo
+*
+
+# Excepto estos
+!.gitignore
+!panel.py
+!scraping.py
+!auditoria.py
