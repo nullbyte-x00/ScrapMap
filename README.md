@@ -1,4 +1,4 @@
-# Webflux · Leads
+# SCRAPMAP · 
 
 Herramienta de escritorio para **conseguir y trabajar clientes potenciales** (prospectos) de negocios locales: busca negocios en Google Maps, revisa sus páginas web, redacta un primer mensaje de WhatsApp personalizado con IA y lleva el seguimiento de cada uno, todo en una sola ventana en modo oscuro.
 
