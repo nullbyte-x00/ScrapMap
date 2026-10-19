@@ -96,7 +96,7 @@ En la cabecera verás `● Base de datos` y `● IA · Groq` en verde si todo qu
 
 ### 1. Buscar negocios
 
-![Scraping en marcha](docs/scraping.png)
+![Scraping en marcha](docs/leads.png)
 
 Arriba están los campos de búsqueda:
 
