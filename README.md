@@ -109,9 +109,13 @@ Arriba están los campos de búsqueda:
 
 ### 2. Secciones
 
+![secciones](docs/secciones.png)
+
 Cada búsqueda crea una **sección** en la columna izquierda, con su cantidad de leads y cuántos son nuevos. Al elegirla, la lista muestra solo los leads de esa búsqueda. *Todos los leads* los junta. Se puede **eliminar una sección** (borra también sus leads) o **eliminar un lead** suelto; siempre pide confirmación.
 
 ### 3. Trabajar un lead
+
+![crud](docs/crud.png)
 
 Al seleccionar un lead a la derecha ves su teléfono, web, red social, correo, enlace de Maps y los **hallazgos** de la auditoría.
 
