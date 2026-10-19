@@ -120,7 +120,7 @@ class App(ctk.CTk):
         self.configure(fg_color=BG)
 
         self.fam = self._elegir_fuente()
-        self.conn = Nonew
+        self.conn = None
         self.filas = []          # todos los leads
         self.scrapes = []        # secciones con contadores
         self.sec = AUTO          # sección elegida: id, None (todas) o AUTO
