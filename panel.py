@@ -1,7 +1,8 @@
 """Webflux · Leads — scraper + CRM de prospectos en una sola app (CustomTkinter, modo oscuro).
 
 Uso:  python panel.py
-Requiere en la misma carpeta: scraping.py, db.py, auditoria.py y tu .env
+Requiere en la misma carpeta: scraping.py, db.py, auditoria.py, mapa.py y tu .env
+(el mapa usa:  pip install tkintermapview)
 """
 import json
 import os
@@ -22,6 +23,11 @@ import psycopg2
 import auditoria
 import db
 import scraping
+
+try:
+    import mapa                      # pip install tkintermapview
+except ImportError:
+    mapa = None
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 ARCHIVO_ESTADO = os.path.join(AQUI, ".panel_estado.json")
@@ -81,7 +87,6 @@ def plural(n, uno, varios):
 
 
 def tel_corto(tel):
-    """573001234567 -> 3001234567 (sin el indicativo, para ahorrar espacio)."""
     return tel[2:] if tel and tel.startswith("57") and len(tel) == 12 else tel
 
 
@@ -123,6 +128,7 @@ class App(ctk.CTk):
         self._sig_tree = None
         self.cards = {}
         self._orden = None
+        self.vista_mapa = None
         self.urls = {}
         self.cola = queue.Queue()
         self.worker = None
@@ -253,8 +259,17 @@ class App(ctk.CTk):
         head.grid_columnconfigure(1, weight=1)
         ctk.CTkLabel(head, text="WEBFLUX", font=self.F(17, True), text_color=BLANCO).grid(
             row=0, column=0, sticky="w")
-        ctk.CTkLabel(head, text="Leads", font=self.F(17), text_color=GRIS).grid(
-            row=0, column=1, sticky="w", padx=(8, 0))
+        sub = ctk.CTkFrame(head, fg_color="transparent")
+        sub.grid(row=0, column=1, sticky="w", padx=(8, 0))
+        ctk.CTkLabel(sub, text="Leads", font=self.F(17), text_color=GRIS).pack(side="left")
+        self.seg_vista = ctk.CTkSegmentedButton(
+            sub, values=["Leads", "Mapa"], command=self.cambiar_vista, font=self.F(11),
+            fg_color=CAMPO, selected_color="#1d2638", selected_hover_color="#222c42",
+            unselected_color=CAMPO, unselected_hover_color=HOVER, text_color=TEXTO,
+            corner_radius=RADIO, width=150)
+        self.seg_vista.set("Leads")
+        if mapa:
+            self.seg_vista.pack(side="left", padx=(20, 0))
         self.lbl_reloj = ctk.CTkLabel(head, text="", font=self.F(11), text_color=GRIS)
         self.lbl_reloj.grid(row=0, column=4, sticky="e", padx=(18, 0))
         self.lbl_ia = ctk.CTkLabel(head, text="", font=self.F(11), text_color=GRIS)
@@ -266,7 +281,7 @@ class App(ctk.CTk):
 
         self._ui_control()
 
-        main = ctk.CTkFrame(self, fg_color="transparent")
+        self.main = main = ctk.CTkFrame(self, fg_color="transparent")
         main.grid(row=2, column=0, sticky="nsew", padx=14, pady=4)
         main.grid_columnconfigure(0, weight=0, minsize=252)
         main.grid_columnconfigure(1, weight=3)
@@ -275,6 +290,7 @@ class App(ctk.CTk):
         self._ui_secciones(main)
         self._ui_lista(main)
         self._ui_detalle(main)
+        self._ui_mapa()
 
         cons = ctk.CTkFrame(self, fg_color=PANEL, border_width=1, border_color=BORDE,
                             corner_radius=RADIO)
@@ -336,6 +352,52 @@ class App(ctk.CTk):
                                        fg_color=BORDE, progress_color=ACENTO)
         self.prog.grid(row=2, column=0, columnspan=6, sticky="ew", padx=10, pady=(0, 7))
         self.prog.set(0)
+
+    # ---------- vista de mapa ----------
+    def _ui_mapa(self):
+        if not mapa:
+            return
+        tema = SimpleNamespace(
+            BG=BG, PANEL=PANEL, CAMPO=CAMPO, BORDE=BORDE, BORDE2=BORDE2, ACENTO=ACENTO,
+            TEXTO=TEXTO, GRIS=GRIS, DIM=DIM, BLANCO=BLANCO, HOVER=HOVER, SELEC=SELEC,
+            RADIO=RADIO, COLOR_ESTADO=COLOR_ESTADO, mezcla=mezcla)
+        self.vista_mapa = mapa.VistaMapa(self, self, tema)
+        self.vista_mapa.grid(row=2, column=0, sticky="nsew", padx=14, pady=4)
+        self.vista_mapa.grid_remove()
+
+    def cambiar_vista(self, vista):
+        if not self.vista_mapa:
+            return
+        self.seg_vista.set(vista)
+        if vista == "Mapa":
+            self.main.grid_remove()
+            self.vista_mapa.grid()
+            self.vista_mapa.mostrar(True)
+        else:
+            self.vista_mapa.mostrar(False)
+            self.vista_mapa.grid_remove()
+            self.main.grid()
+
+    def ir_a_lead(self, pid):
+        """Salta a la vista Leads con ese lead seleccionado (desde un marcador del mapa)."""
+        r = self._fila(pid)
+        if not r:
+            return
+        self.cambiar_vista("Leads")
+        self.sec = r["scrape_id"]
+        self.seg.set("todos")
+        self.busca.delete(0, "end")
+        self._guardar_estado()
+        self._pintar_secciones()
+        self._cabecera_seccion()
+        self.sel = None
+        self._mostrado = None
+        self.aplicar_filtro()
+        self._stats()
+        iid = str(pid)
+        if self.tree.exists(iid):
+            self.tree.selection_set(iid)
+            self.tree.see(iid)
 
     # ---------- columna 0: secciones ----------
     def _ui_secciones(self, main):
@@ -588,6 +650,8 @@ class App(ctk.CTk):
         self._cabecera_seccion()
         self.aplicar_filtro()
         self._stats()
+        if self.vista_mapa:
+            self.vista_mapa.actualizar()
         if not silencioso:
             self.msg(f"{len(self.filas)} leads en {len(self.scrapes)} secciones")
 
@@ -1018,6 +1082,8 @@ class App(ctk.CTk):
                     self.log("[proceso terminado]" if dato == 0 else "[proceso terminó con errores]",
                              "ok" if dato == 0 else "err")
                     self.refrescar()
+                    if self.vista_mapa:
+                        self.vista_mapa.actualizar(force=True)
                     if self._job == "scrape":
                         nuevas = [s["id"] for s in self.scrapes if s["id"] not in self._ids_previos]
                         if nuevas:                       # saltar a la sección recién creada
