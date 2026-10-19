@@ -4,7 +4,7 @@ Herramienta de escritorio para **conseguir y trabajar clientes potenciales** (pr
 
 Pensada para quien ofrece servicios de desarrollo web y automatización a negocios de su zona.
 
-![Panel principal](docs/panel.png)
+![Panel principal](docs/leads.png)
 
 ---
 
